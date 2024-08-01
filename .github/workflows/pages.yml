@@ -1,4 +1,4 @@
-name: Pages
+name: GitHub Pages
 
 on:
   push:
@@ -27,6 +27,8 @@ jobs:
           key: ${{ runner.OS }}-npm-cache
           restore-keys: |
             ${{ runner.OS }}-npm-cache
+      - name: Install Theme
+        run: npm install -S hexo-theme-icarus hexo-renderer-inferno
       - name: Install Dependencies
         run: npm install
       - name: Build
