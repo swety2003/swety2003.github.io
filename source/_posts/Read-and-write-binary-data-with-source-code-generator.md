@@ -16,8 +16,8 @@ tags:
 
 ## 单个消息的封送
 
-拿 [SOME/IP(Scalable service-Oriented MiddlewarE over IP)](https://www.autosar.org/fileadmin/standards/R22-11/FO/AUTOSAR_PRS_SOMEIPProtocol.pdf) 协议为例:
-![SOME/IP Header Format](../_images/some-ip-format.png)
+拿 [SOME/IP(Scalable service-Oriented MiddlewarE over IP)](https://www.autosar.org/fileadmin/standards/R22-11/FO/AUTOSAR_PRS_SOMEIPProtocol.pdf) 协议为例:  
+![SOME/IP Header Format](/images/some-ip-format.png)  
 我们可以很快用struct表示出它的结构:
 ```C#
 public partial struct SomeIpMessage
@@ -528,9 +528,9 @@ public partial struct StructA
     public byte[] Data;
 }
 ```
-实现 `IPackable<TestStruct>` 接口
+实现 `IPackable<StructA>` 接口
 ```C#
-public partial struct StructA: IPackable<TestStruct>
+public partial struct StructA: IPackable<StructA>
 {   
     public int GetSize()=>0 + BinaryUtils.GetSize(Id) + BinaryUtils.GetSize(Data);
 
@@ -546,7 +546,7 @@ public partial struct StructA: IPackable<TestStruct>
         
         return destBytes;
     }
-    public TestStruct Deserialize(byte[] sourceData, bool isBigEndian=true, int startIndex = 0)
+    public StructA Deserialize(byte[] sourceData, bool isBigEndian=true, int startIndex = 0)
     {
         // 默认
         Id = BinaryUtils.ReadFromBytes(Id, sourceData, ref startIndex, isBigEndian);
@@ -558,7 +558,7 @@ public partial struct StructA: IPackable<TestStruct>
     }
 }
 ```
-处理自动长度的数组
+定义处理自动长度的数组的转换器
 ```C#
 public class AutoSizeArrayConvertor:IArrayBinaryConvertor<byte>
 {
@@ -954,6 +954,42 @@ public class StructPackerGenerator : ISourceGenerator
 </ItemGroup>
 ```
 
+定义 SomeIpMessage
+```C#
+[Packable]
+public partial struct SomeIpMessage
+{
+    
+    public Header Header;
+    public uint Length;
+    public RequestId RequestId;
+    public ProtocolInfo ProtocolInfo;
+    
+    [CustomBinaryConvertor(typeof(AutoSizeArrayConvertor))]
+    public byte[] PayLoad;
+}
+[Packable]
+public partial struct ProtocolInfo
+{
+    public byte ProtocolVersion;
+    public byte InterfaceVersion;
+    public byte MessageType;
+    public byte ReturnCode;
+
+}
+[Packable]
+public partial struct RequestId
+{
+    public UInt16 ClientId;
+    public UInt16 SessionId;
+}
+[Packable]
+public partial struct Header
+{
+    public UInt16 ServiceId;
+    public UInt16 MethodId;
+}
+```
 
 ```C#
 

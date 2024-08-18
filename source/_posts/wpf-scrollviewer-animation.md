@@ -6,7 +6,6 @@ categories:
 tags:
 - WPF
 ---
-# 为 WPF 的 ScrollViewer 添加滚动动画
 
 在 WPF 中，ScrollViewer 默认没有直接支持滚动动画的属性。不过，我们可以通过自定义附加属性和动画来实现滚动动画效果。 
 
